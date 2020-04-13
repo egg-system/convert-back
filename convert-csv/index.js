@@ -42,7 +42,7 @@ const handleGetMethod = async (params) => {
 }
 
 const convertCsv = (csv, settings) => {
-  // headerは省略する
+  // 同名のheaderがある場合、挙動がおかしくなるので、headerは数値にする
   const fromHeaders = settings.csvHeaders.map(header => header.value.toString())
   const fromValues = parse(csv, { from_line: 2, columns: fromHeaders })
 
