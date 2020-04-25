@@ -2,6 +2,21 @@ const aws = require('aws-sdk')
 aws.config.region = process.env.REGION
 const s3 = new aws.S3()
 
+const putFile = async (fileKey, body) => {
+  const putParams = {
+    Bucket: process.env.BUCKET,
+    Key: fileKey,
+    Body: body
+  }
+
+  try {
+    return await s3.putObject(putParams).promise()
+  } catch (error) {
+    console.log(error)
+    return null
+  }
+}
+
 const getFile = async (fileKey) => {
   const s3Config = {
     Bucket: process.env.BUCKET,
@@ -17,4 +32,4 @@ const getFile = async (fileKey) => {
   }
 }
 
-module.exports = { getFile }
+module.exports = { getFile, putFile }
