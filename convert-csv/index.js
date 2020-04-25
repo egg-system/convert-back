@@ -1,12 +1,11 @@
 const { getFile } = require('storage')
-const parse = require('csv-parse/lib/sync')
-const stringify = require('csv-stringify/lib/sync')
+const { convetCsv } = require('./convert-csv')
 
 exports.handler = async (event) => {
   if (event.httpMethod === "GET") {
-    return await handleGetMethod(event.queryStringParameters)
+    return await hadnleGetMethod(event.queryStringParameters)
   }
-  
+
   return {
     statusCode: 403,
     headers: {
@@ -16,19 +15,9 @@ exports.handler = async (event) => {
   }
 }
 
-const handleGetMethod = async (params) => {
-  const results = await Promise.all([
-    getFile(params.csv),
-    getFile(params.settings)
-  ])
-
-  const csv = results[0]
-  const settings = JSON.parse(results[1])
-
-  const convertedCsvArray = convertCsv(csv, settings)
-  const convertedCsv = stringify(convertedCsvArray, {
-    quoted: true
-  })
+const hadnleGetMethod = async (params) => {
+  const { csv, settings } = await getFiles(params)
+  const convertedCsv = convetCsv({ csv, settings })
 
   return {
     statusCode: 200,
@@ -41,29 +30,23 @@ const handleGetMethod = async (params) => {
   }
 }
 
-const convertCsv = (csv, settings) => {
-  // 同名のheaderがある場合、挙動がおかしくなるので、headerは数値にする
-  const fromHeaders = settings.csvHeaders.map(header => header.value.toString())
-  const fromValues = parse(csv, { from_line: 2, columns: fromHeaders })
+const getFiles = async ({ csv, settings }) => {
+  const results = await Promise.all([
+    getFile(csv),
+    getFile(settings)
+  ])
 
-  const converters = settings.convertSettings
-  const convertedCsvHeader = converters.map(converter => converter.name)
-
-  const convertedCsv = fromValues.map(record => convertCsvRecord(record, converters))
-  convertedCsv.unshift(convertedCsvHeader)
-
-  return convertedCsv
-}
-
-const convertCsvRecord = (record, converters) => {
-  return converters.map(converter => {
-    if (converter.fixedValue) {
-      return converter.fixedValue
+  if (!results) {
+    return {
+      statusCode: 404,
+      headers: {
+        "Access-Control-Allow-Origin": process.env.FRONT
+      },
+      body: 'requested file is not found'
     }
+  }
 
-    const fromIndex = converter.fromIndex.toString()
-    const fromValue = record[fromIndex]
-
-    return fromValue
-  })
+  const csvFile = results[0]
+  const settingsFile = JSON.parse(results[1])
+  return { csv: csvFile, settings: settingsFile }
 }

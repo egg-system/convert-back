@@ -1,0 +1,13 @@
+{
+  "name": "convert-csv-layer",
+  "version": "1.0.0",
+  "description": "convert-csv-service-lamda's package",
+  "author": "x-faCE",
+  "private": true,
+  "dependencies": {
+    "csv": "^5.3.2"
+  },
+  "devDependencies": {
+    "yarn": "^1.22.4"
+  }
+}
