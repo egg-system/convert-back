@@ -11,25 +11,41 @@ const convetCsv = ({ csv, settings }) => {
 const doConvertCsv = ({ csv, settings }) => {
   // 同名のheaderがある場合、挙動がおかしくなるので、headerは数値にする
   const fromHeaders = settings.csvHeaders.map(header => header.value.toString())
-  const fromValues = parse(csv, { from_line: 2, columns: fromHeaders })
+  const fromValues = parse(csv, {
+    from_line: 2,
+    columns: fromHeaders,
+    relax_column_count: true
+  })
 
-  const converters = settings.convertSettings
-  const convertedCsvHeader = converters.map(converter => converter.name)
-
-  const convertedCsv = fromValues.map(record => convertCsvRecord({ record, converters }))
+  const convertedCsv = fromValues.map(record => convertCsvRecord({ record, settings }))
+  const convertedCsvHeader = settings.convertSettings.map(converter => converter.name)
   convertedCsv.unshift(convertedCsvHeader)
 
   return convertedCsv
 }
 
-const convertCsvRecord = ({ record, converters }) => {
-  return converters.map(converter => {
-    if (converter.fixedValue) {
+const doReplace = ({ fromValue, replaces }) => {
+  const replacedValue = replaces.find((replace) => replace.from === fromValue)
+  if (!!replacedValue) {
+    return replacedValue.to
+  }
+
+  return fromValue
+}
+
+const convertCsvRecord = ({ record, settings }) => {
+  return settings.convertSettings.map(converter => {
+    if (!!converter.fixedValue) {
       return converter.fixedValue
     }
 
     const fromIndex = converter.fromIndex.toString()
-    const fromValue = record[fromIndex]
+    let fromValue = record[fromIndex]
+    
+    if (!!converter.replaceKey) {
+      const replaces = settings.replaceSettings[converter.replaceKey]
+      fromValue = doReplace({ fromValue, replaces })
+    }
 
     return fromValue
   })
