@@ -21,15 +21,18 @@ const hadnleGetMethod = async (params) => {
   const convertedCsv = convetCsv({ csv, settings })
   const csvBuffer = iconvLite.encode(convertedCsv, params.encode)
 
-  const convertedCsvKey = `${params.csv}${params.settings}`
+  const convertedCsvKey = `${params.csv}${params.settings}/converterd.csv`
   await putFile(convertedCsvKey, csvBuffer)
 
   return {
     statusCode: 200,
     headers: {
-      "Access-Control-Allow-Origin": process.env.FRONT,
+      "Access-Control-Allow-Origin": process.env.FRONT
     },
-    body: await downloadUrl(convertedCsvKey)
+    body: JSON.stringify({
+      url: await downloadUrl(convertedCsvKey),
+      fileKey: convertedCsvKey
+    })
   }
 }
 
@@ -43,7 +46,7 @@ const getFiles = async ({ csv, settings }) => {
     return {
       statusCode: 404,
       headers: {
-        "Access-Control-Allow-Origin": process.env.FRONT
+        "Access-Control-Allow-Origin": process.env.FRONT,
       },
       body: 'requested file is not found'
     }
