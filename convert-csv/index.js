@@ -1,4 +1,5 @@
-const { getFile } = require('storage')
+const iconvLite = require('iconv-lite');
+const { getFile, putFile, downloadUrl } = require('storage')
 const { convetCsv } = require('./convert-csv')
 
 exports.handler = async (event) => {
@@ -18,15 +19,17 @@ exports.handler = async (event) => {
 const hadnleGetMethod = async (params) => {
   const { csv, settings } = await getFiles(params)
   const convertedCsv = convetCsv({ csv, settings })
+  const csvBuffer = iconvLite.encode(convertedCsv, params.encode)
+
+  const convertedCsvKey = `${params.csv}${params.settings}`
+  await putFile(convertedCsvKey, csvBuffer)
 
   return {
     statusCode: 200,
     headers: {
       "Access-Control-Allow-Origin": process.env.FRONT,
-      "Content-Disposition": "attachment",
-      "Content-Type": "text/csv"
     },
-    body: convertedCsv
+    body: await downloadUrl(convertedCsvKey)
   }
 }
 
