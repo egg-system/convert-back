@@ -14,6 +14,9 @@ storage.zip:
 files.zip:
 	@make zip MODULE=files FILE=files
 
+deleter.zip:
+	@make zip MODULE=file-deleter FILE=deleter
+
 zip:
 	cd ${MODULE} && yarn install --production && zip -r ${MODULE}.zip .
 	mv ${MODULE}/${MODULE}.zip ./${FILE}.zip

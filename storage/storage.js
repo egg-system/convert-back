@@ -32,4 +32,19 @@ const getFile = async (fileKey) => {
   }
 }
 
-module.exports = { getFile, putFile }
+const downloadUrl = async (fileKey) => {
+  const s3Config = {
+    Bucket: process.env.BUCKET,
+    Key: fileKey,
+    Expires: Number(process.env.EXPIRES)
+  }
+
+  try {
+    return await s3.getSignedUrl('getObject', s3Config)
+  } catch (error) {
+    console.log(error)
+    return null
+  }
+}
+
+module.exports = { getFile, putFile, downloadUrl }

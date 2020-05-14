@@ -5,7 +5,8 @@
   "author": "x-faCE",
   "private": true,
   "dependencies": {
-    "csv": "^5.3.2"
+    "csv": "^5.3.2",
+    "iconv-lite": "^0.5.1"
   },
   "devDependencies": {
     "yarn": "^1.22.4"
