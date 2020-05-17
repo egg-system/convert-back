@@ -1,0 +1,11 @@
+{
+    "name": "storage",
+    "version": "1.0.0",
+    "description": "convert-csv-service's manage storage",
+    "author": "x-faCE",
+    "private": true,
+    "dependencies": {
+      "storage": "file:../storage"
+    }
+  }
+  

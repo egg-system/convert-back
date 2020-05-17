@@ -1,8 +1,5 @@
 const moment = require('moment')
-const aws = require('aws-sdk')
-
-aws.config.region = process.env.REGION
-const s3 = new aws.S3()
+const { s3 } = require('storage/get-s3')
 
 exports.handler = async (event) => {
   const configs = { Bucket: process.env.STORAGE }
