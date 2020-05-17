@@ -4,7 +4,12 @@ const { putFile } = require('storage')
 /* global TextDecoder */
 const hadnlePutMethod = async ({ fileKey, file }) => {
   const encode = encoding.detect(file)
-  const content = new TextDecoder(encode).decode(file)
+  let content = file
+
+  // TextDecoderはUNICODEをサポートしていないため
+  if (file instanceof Buffer) {
+    content = new TextDecoder(encode).decode(file)
+  }
 
   await putFile(fileKey, content)
   return {
