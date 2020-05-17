@@ -1,7 +1,7 @@
 const Busboy = require('busboy')
 
 const extractRequestBody = ({ resolve, event }) => {
-    const busboy = new Busboy({ headers: event.headers })
+    const busboy = new Busboy({ headers: extractRequestHeader(event) })
 
     const body = {}
     busboy.on('file', (fieldname, file) => {
@@ -12,6 +12,14 @@ const extractRequestBody = ({ resolve, event }) => {
     busboy.on('finish', () => resolve(body))
     busboy.write(event.body, event.isBase64Encoded ? 'base64' : 'utf8')
     busboy.end()
+}
+
+const extractRequestHeader = ({ headers }) => {
+    Object.keys(headers).forEach((key) => {
+        headers[key.toLowerCase()] = headers[key]
+    })
+
+    return headers
 }
 
 const parseFormData = async (event) => {
