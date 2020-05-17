@@ -1,0 +1,33 @@
+{
+  "name": "test-convert-service-back",
+  "version": "1.0.0",
+  "description": "testing convert service for backend",
+  "main": "test/index.js",
+  "repository": "https://github.com/egg-system/csv-convert-back",
+  "author": "x-faCE",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "build": "yarn upgrade convert-csv files file-deleter storage",
+    "buildTest": "yarn build && yarn test",
+    "test": "NODE_ENV=test NODE_ICU_DATA=node_modules/full-icu mocha test/index.js"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.678.0",
+    "chai": "^4.2.0",
+    "convert-csv": "file:./convert-csv",
+    "dotenv": "^8.2.0",
+    "file-deleter": "file:./file-deleter",
+    "files": "file:./files",
+    "form-data": "^3.0.0",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
+    "mocha": "^7.1.2",
+    "mock-require": "^3.0.3",
+    "storage": "file:./storage/storage",
+    "yarn": "^1.22.4"
+  },
+  "dependencies": {
+    "full-icu": "^1.3.1"
+  }
+}
