@@ -1,7 +1,7 @@
 const Busboy = require('busboy')
 
 const extractRequestBody = ({ resolve, event }) => {
-    const busboy = new Busboy({ headers: extractRequestHeader(event) })
+    const busboy = new Busboy({ headers: event.headers })
 
     const body = {}
     busboy.on('file', (fieldname, file) => {
@@ -14,15 +14,16 @@ const extractRequestBody = ({ resolve, event }) => {
     busboy.end()
 }
 
-const extractRequestHeader = ({ headers }) => {
-    Object.keys(headers).forEach((key) => {
-        headers[key.toLowerCase()] = headers[key]
-    })
-
-    return headers
-}
-
 const parseFormData = async (event) => {
+    if (Object.keys(event.headers).includes('Content-Type')) {
+        event.headers['content-type'] = event.headers['Content-Type']
+    }
+
+    // jsonの場合は、parseのみ実行する
+    if (/application\/json/.test(event.headers['content-type'])) {
+        return JSON.parse(event.body)
+    }
+
     return await new Promise((resolve) => {
         extractRequestBody({ resolve, event })
     })
