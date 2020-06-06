@@ -1,18 +1,23 @@
 const moment = require('moment')
-const { s3 } = require('storage/get-s3')
+const aws = require('aws-sdk')
+
+aws.config.region = process.env.REGION
+const s3 = new aws.S3()
 
 exports.handler = async (event) => {
   const configs = { Bucket: process.env.STORAGE }
-  // momentのデフォルトはUTCなので現在時刻は+9時間になる。
-  const now = moment().add(9, 'hours')
-  
+
   // ファイルの有効期限は1時間前のため、-1時間する
-  const expiredAt = now.subtract(1, 'hours')
+  //  ※ s3の日付もUTCなので、タイムゾーンは考慮不要
+  const expiredAt = moment().subtract(1, 'hours')
   
   const { Contents } = await s3.listObjectsV2(configs).promise()
   const deleteKeys = Contents
-    .filter((content) => expiredAt.isAfter(moment(content.LastModified)))
+    .filter((content) => {
+      return expiredAt.isAfter(moment(content.LastModified))
+    })
     .map((content) => ({ Key: content.Key }))
+  console.log(deleteKeys)
 
   if (deleteKeys.length === 0) {
    return
