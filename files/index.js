@@ -23,11 +23,13 @@ exports.handler = async (event) => {
 
 const hadnleGetMethod = async ({ fileKey }) => {
   const body = await getFile(fileKey)
+  const isNotFound = body === null
+
   return {
-    statusCode: 200,
+    statusCode: isNotFound ? 404 : 200,
     headers: {
       "Access-Control-Allow-Origin": process.env.FRONT,
     },
-    body: body
+    body: isNotFound ? 'requested resource is not found' : body
   }
 }
