@@ -2,6 +2,6 @@
   "name": "file-deleter",
   "version": "1.0.0",
   "dependencies": {
-    "moment": "^2.25.3"
+    "moment": "^2.29.2"
   }
 }
